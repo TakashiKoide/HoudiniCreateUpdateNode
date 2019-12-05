@@ -32,6 +32,6 @@ core.main()
 - ノード自体が追加された物は**NewNodes**、パラメータが追加されたノードは**NewParmNodes**という**Subnet**が作成され、中に**Sop**などカテゴリごとにノードが出来ます。
 ![New Sop](https://dl.dropboxusercontent.com/s/exs9g6r51nj4hhx/NewSop.jpg?dl=0)
 
-- 追加されたパラメータには**constant()**というエクスプレッションが入っているので、パラメータのフィルターから**Parameters with Non-Default Values**を選ぶと追加されたパラメータのみ表示出来るようになっています。  
+- 追加されたパラメータには**constant**というエクスプレッションが入っているので、パラメータのフィルターから**Parameters with Non-Default Values**を選ぶと追加されたパラメータのみ表示出来るようになっています。  
 ※一部のパラメータにはエクスプレッションをセット出来ないので、全てではありません
 ![Parameter Filter](https://dl.dropboxusercontent.com/s/9d7p5n2jmr7dmpx/ParmFilter.jpg?dl=0)
