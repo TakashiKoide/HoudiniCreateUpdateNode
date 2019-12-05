@@ -112,15 +112,22 @@ def create_nodes(node_data, root_node):
         elif category == 'Vop':
             parent_node = root_node.createNode('matnet', category)
         elif not 'Net' in category:
-            parent_node = root_node.createNode(
-                category.lower() + 'net', category)
+            try:
+                parent_node = root_node.createNode(
+                    category.lower() + 'net', category)
+            except:
+                continue
         else:
             parent_node = root_node.createNode(category.lower(), category)
         #ノードの作成
         for node_info in nodes:
             #ノードの名前を取得して作成
             node_name = node_info['Node Name']
-            new_node = parent_node.createNode(node_name)
+            try:
+                new_node = parent_node.createNode(node_name)
+            except:
+                print(category + '/' + node_name)
+                continue
             #パラメータの取得
             parms = node_info.get('parms')
             if not parms:
