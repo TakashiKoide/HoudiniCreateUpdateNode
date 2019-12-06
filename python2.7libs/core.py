@@ -14,7 +14,7 @@ def get_compare_version(hfs):
     #バージョンを選択用のリストビューを表示
     sel_version = hou.ui.selectFromList(
         versions, exclusive=True, title='Select Compare Version',
-        column_header='Versions', width=240, height=240)
+        column_header='Versions')
     if not sel_version:
         return
     version = versions[sel_version[0]]
@@ -26,24 +26,21 @@ def get_env_from_version(version, hfs, pref_dir):
         os.path.dirname(pref_dir),
         '.'.join(version.replace('Houdini ', 'houdini').split('.')[:2])
     )
-    module_path = old_hfs + '/houdini/python2.7libs'
-    return old_hfs, old_pref_dir, module_path
+    return old_hfs, old_pref_dir
 
-def set_base_env(hfs, pref_dir, module_path, restore=False):
+def set_base_env(path, hfs, pref_dir):
     #環境変数とPythonパスを設定する
+    os.putenv('PATH', path)
     os.putenv('HFS', hfs)
     os.putenv('HOUDINI_USER_PREF_DIR', pref_dir)
-    if restore:
-        sys.path.remove(module_path)
-    else:
-        sys.path.append(module_path)
 
-def get_old_node_data(old_hfs, old_pref_dir, module_path):
+def get_old_node_data(old_hfs, old_pref_dir):
     script_root = os.path.dirname(__file__)
     script = os.path.normpath(script_root + "/get_node_data.py")
     hython = os.path.normpath(old_hfs + '/bin/hython.exe')
     #hythonに投げる前に必要な環境変数とPythonのパスを通す
-    set_base_env(old_hfs, old_pref_dir, module_path)
+    path = '{}/bin;{}'.format(old_hfs, os.getenv('PATH'))
+    set_base_env(path, old_hfs, old_pref_dir)
     #hythonでスクリプトを実行する
     p = subprocess.Popen([hython, script], shell=True, stdout=PIPE, stderr=PIPE)
     #スクリプトからの戻り値を取得
@@ -126,7 +123,6 @@ def create_nodes(node_data, root_node):
             try:
                 new_node = parent_node.createNode(node_name)
             except:
-                print(category + '/' + node_name)
                 continue
             #パラメータの取得
             parms = node_info.get('parms')
@@ -157,15 +153,16 @@ def main():
     if not version:
         return
     pref_dir = os.getenv('HOUDINI_USER_PREF_DIR')
+    path = os.getenv('PATH')
     #比較するバージョンの環境変数を取得
-    old_hfs, old_pref_dir, module_path = get_env_from_version(
+    old_hfs, old_pref_dir = get_env_from_version(
         version, hfs, pref_dir)
     #比較するバージョンのノード情報を取得
-    old_node_data = get_old_node_data(old_hfs, old_pref_dir, module_path)
+    old_node_data = get_old_node_data(old_hfs, old_pref_dir)
     if not old_node_data:
         return
     #hython用にセットした環境変数を元に戻す
-    set_base_env(hfs, pref_dir, module_path, restore=True)
+    set_base_env(path, hfs, pref_dir)
     #現在のバージョンにあるノードと比較してノードの情報を取得
     new_node_data, new_parm_node_data = compare(old_node_data)
     #現在のバージョンのみに存在するノードを作成
