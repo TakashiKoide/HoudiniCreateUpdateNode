@@ -5,16 +5,28 @@ import sys
 import subprocess
 from subprocess import PIPE
 
+from .get_node_data import get_all_parm_templates
+
 def get_compare_version(hfs):
     version_root = os.path.dirname(hfs)
     versions = os.listdir(version_root)
-    current_version = 'Houdini ' + hou.applicationVersionString()
+    version_num = hou.applicationVersionString()
+    current_version = 'Houdini ' + version_num
     if current_version in versions:
         versions.remove(current_version)
+    #UIのオプション用辞書
+    kwargs = {
+        'exclusive': True,
+        'title': 'Select Compare Version',
+        'column_header': 'Versions'
+    }
+    #Houdini17.0以降はUIのwidth、heightオプションを使う
+    if float('.'.join(version_num.split('.')[:-1])) > 17.0:
+        kwargs['width'] = 240
+        kwargs['height'] = 240
     #バージョンを選択用のリストビューを表示
     sel_version = hou.ui.selectFromList(
-        versions, exclusive=True, title='Select Compare Version',
-        column_header='Versions')
+        versions, **kwargs)
     if not sel_version:
         return
     version = versions[sel_version[0]]
@@ -82,10 +94,10 @@ def compare(old_node_data):
             node_label = node_type.description()
             node_info = get_node_info(node_name, node_label)
             if node_name in old_node_names:
-                parms = node_type.parmTemplates()
+                all_parms = get_all_parm_templates([], node_type)
                 index = old_node_names.index(node_name)
                 parm_sets = set(old_nodes[index]['parms'])
-                new_parms = [parm.name() for parm in parms if not parm.name() in parm_sets]
+                new_parms = [parm.name() for parm in all_parms if not parm.name() in parm_sets]
                 if new_parms:
                     node_info['parms'] = new_parms
                     new_parm_nodes.append(node_info)
@@ -111,7 +123,7 @@ def create_nodes(node_data, root_node):
         elif not 'Net' in category:
             try:
                 parent_node = root_node.createNode(
-                    category.lower() + 'net', category)
+                    category.lower() + 'net', category, run_init_scripts=False)
             except:
                 continue
         else:
@@ -131,7 +143,13 @@ def create_nodes(node_data, root_node):
             #パラメータにエクスプレッションを設定
             for parm_name in parms:
                 try:
-                    new_node.parm(parm_name).setExpression('constant()')
+                    if parm_name[-1] == '#':
+                        parm_name = parm_name[:-1] + '1'
+                    parm_tuple = new_node.parmTuple(parm_name)
+                    if not parm_tuple:
+                        continue
+                    for parm in parm_tuple:
+                        parm.setExpression('constant()')
                 except:
                     pass
         #ノード整理
