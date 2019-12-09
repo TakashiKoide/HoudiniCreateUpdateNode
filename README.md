@@ -11,17 +11,27 @@ Houdiniで指定したバージョンから更新のあったノードをまと�
 1. **Clone or download > Download ZIP**からZIPファイルをダウンロードします。
 
 2. 解凍したフォルダ内の**python2.7libs**をPythonが認識される場所にコピーしてください。  
-Windowsの場合は`C:\Users\ユーザ名\Documents\houdiniバージョン名`にコピーすると自動で認識されます。
+Windowsの場合は`%HOMEDRIVE%%HOMEPATH%\Documents\houdiniバージョン`にコピーすると自動で認識されます。
+![Script Place](https://dl.dropboxusercontent.com/s/nzidjyjb93ud2yu/ScriptPlace.jpg?dl=0)
 
-3. Houdiniを起動し、シェルフ内を右クリック>New Tool...をクリックします。
+3. Houdiniを起動し、シェルフの+をクリック>New Shelf...をクリックします。
+![Shelf Set01](https://dl.dropboxusercontent.com/s/vvjmo3q8hhwawe0/NewShelfSet01.jpg?dl=0)
 
-4. OptionsタブのNameをcreate_update_nodeにし、LabelをCreate Update Nodeにします。
+4. シェルフセットの設定ウィンドウが開くので、適当な名前を付け、Acceptを押します。
+![Shelf Set02](https://dl.dropboxusercontent.com/s/borw48j2heyzwle/NewShelfSet02.jpg?dl=0)
 
-5. Scriptタブに下記コードを記入します。
+5. 新しく作ったシェルフ上で右クリック>New Tool...をクリックします。
+![Shelf New Tool](https://dl.dropboxusercontent.com/s/8jejzujehy6u1ke/ShelfNewTool.jpg?dl=0)
+
+6. OptionsタブのNameをcreate_update_nodeにし、LabelをCreate Update Nodeにします。
+![Self Tool Setting](https://dl.dropboxusercontent.com/s/pudqm3e7cv4sa3b/ShelfToolSetting.jpg?dl=0)
+
+7. Scriptタブに下記コードを記入します。
 ```Python
 from create_update_node import core
 core.main()
-```
+```  
+![Self Tool Script](https://dl.dropboxusercontent.com/s/lbqty4et69f1auj/ShelfToolScript.jpg?dl=0)
 
 # スクリプトの実行
 - 登録したシェルフツールをクリックすることでスクリプトが実行されます。
